@@ -1,4 +1,4 @@
-package com.example.tweetgobackend;
+package oth.ics.wtp.tweetgobackend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
