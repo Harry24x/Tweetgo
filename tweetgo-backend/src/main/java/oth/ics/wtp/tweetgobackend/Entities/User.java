@@ -19,4 +19,9 @@ public class User {
         this.password = password;
     }
 
+    public String getusername() {
+ return username; }
+
+    public String getpassword() {
+   return password; }
 }

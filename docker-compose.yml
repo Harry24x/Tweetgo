@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: mariadb:latest
+    container_name: tweetgo-db
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=asdf1234
+      - MARIADB_DATABASE=tweetgo
+    volumes:
+      - ./db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  adminer:
+    image: adminer
+    container_name: tweetgo-adminer
+    restart: always
+    ports:
+      - "8081:8080"   # host 8081 → container 8080
+    depends_on:
+      - db
+
+
+  backend:
+    build:
+      context: ./tweetgo-backend
+      dockerfile: Dockerfile
+    image: tweetgo-backend:latest
+    container_name: tweetgo-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/tweetgo?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=asdf1234
+
+  frontend:
+    build:
+     context: ./tweetgo-frontend
+     dockerfile: Dockerfile
+    container_name: tweetgo-frontend
+    ports:
+    - "3000:80"
+    depends_on:
+    - backend
+
+volumes:
+ mariadb_data:
