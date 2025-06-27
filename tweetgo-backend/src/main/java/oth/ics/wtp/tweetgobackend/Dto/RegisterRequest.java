@@ -1,4 +1,4 @@
-package oth.ics.wtp.tweetgobackend.dtos;
+package oth.ics.wtp.tweetgobackend.Dto;
 
 
 public class RegisterRequest {

@@ -1,4 +1,4 @@
-version: "3.9"
+
 
 services:
 
@@ -19,7 +19,7 @@ services:
     container_name: tweetgo-adminer
     restart: always
     ports:
-      - "8081:8080"   # host 8081 → container 8080
+      - "8081:8080"
     depends_on:
       - db
 
@@ -52,3 +52,4 @@ services:
 
 volumes:
  mariadb_data:
+ backend_uploads:

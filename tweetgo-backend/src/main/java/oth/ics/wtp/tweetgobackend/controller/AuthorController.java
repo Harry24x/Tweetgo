@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import oth.ics.wtp.tweetgobackend.dtos.AuthorResponse;
-import oth.ics.wtp.tweetgobackend.dtos.LoginRequest;
-import oth.ics.wtp.tweetgobackend.dtos.RegisterRequest;
+import oth.ics.wtp.tweetgobackend.Dto.AuthorResponse;
+import oth.ics.wtp.tweetgobackend.Dto.LoginRequest;
+import oth.ics.wtp.tweetgobackend.Dto.RegisterRequest;
 import oth.ics.wtp.tweetgobackend.security.JwtUtil;
 import oth.ics.wtp.tweetgobackend.services.UserService;
 
@@ -30,7 +30,7 @@ public class AuthorController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> Register(@RequestBody RegisterRequest request) {
         if (userService.usernameExists(request.username)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
         }

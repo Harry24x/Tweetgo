@@ -1,13 +1,23 @@
 package oth.ics.wtp.tweetgobackend.services;
 
-
-import oth.ics.wtp.tweetgobackend.Entities.User;
-import oth.ics.wtp.tweetgobackend.repositories.UserRepository;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import oth.ics.wtp.tweetgobackend.Dto.UserDto;
+import oth.ics.wtp.tweetgobackend.Entities.User;
+import oth.ics.wtp.tweetgobackend.repositories.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Service
+@Getter
+@Setter
+
 public class UserService {
 
     @Autowired
@@ -17,6 +27,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public boolean usernameExists(String username) {
+
         return userRepository.existsByUsername(username);
     }
 
@@ -26,7 +37,45 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+
+    public void followUser(String followerUsername, String targetUsername) {
+        User follower = userRepository.findByUsername(followerUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + followerUsername));
+        User target = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetUsername));
     }
+
+    public void unfollowUser(String followerUsername, String targetUsername) {
+        User follower = userRepository.findByUsername(followerUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + followerUsername));
+        User target = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetUsername));
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> searchUsers(String query, String currentUsername) {
+        return userRepository.findByUsername(query).stream()
+                .filter(u -> !u.getUsername().equals(currentUsername))
+                .map(user -> mapUserToDto(user))
+                .collect(Collectors.toList());
+    }
+
+    private UserDto mapUserToDto(User user) {
+        return mapUserToDto(user, null);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto getUserProfile(String username, String currentUsername) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+        User currentUser = userRepository.findByUsername(currentUsername).orElse(null);
+        return mapUserToDto(user, currentUser);
+    }
+
+    private UserDto mapUserToDto(User user, User currentUser) {
+        UserDto dto = new UserDto();
+        dto.setUsername(user.getUsername());
+        dto.setFollowersCount(user.getFollowers().size());
+        dto.setFollowingCount(user.getFollowing().size());
+        return dto;}
 }
