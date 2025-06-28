@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 
 @Configuration
-public class SecurityConfig {
+public class  SecurityConfig {
 
     private final JwtFilter jwtFilter;
 
