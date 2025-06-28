@@ -17,7 +17,7 @@ import org.springframework.web.cors.*;
 import java.util.Arrays;
 
 @Configuration
-public class SecurityConfig {
+public class  SecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final UserDetailsService userDetailsService;

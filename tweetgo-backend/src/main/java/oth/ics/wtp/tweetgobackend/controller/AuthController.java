@@ -18,7 +18,7 @@ import oth.ics.wtp.tweetgobackend.services.UserService;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthorController {
+public class AuthController {
 
     @Autowired
     private UserService userService;
@@ -31,7 +31,7 @@ public class AuthorController {
 
     @PostMapping("/register")
     public ResponseEntity<?> Register(@RequestBody RegisterRequest request) {
-        if (userService.usernameExists(request.username)) {
+        if (userService.usernameExists(request.username)){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
         }
         userService.registerUser(request.username, request.password);
