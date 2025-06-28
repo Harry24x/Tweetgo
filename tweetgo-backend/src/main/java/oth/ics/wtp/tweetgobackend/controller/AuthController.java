@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import oth.ics.wtp.tweetgobackend.Dto.AuthorResponse;
 import oth.ics.wtp.tweetgobackend.Dto.LoginRequest;
 import oth.ics.wtp.tweetgobackend.Dto.RegisterRequest;
@@ -18,7 +15,8 @@ import oth.ics.wtp.tweetgobackend.services.UserService;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthorController {
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
+public class AuthController {
 
     @Autowired
     private UserService userService;
@@ -31,7 +29,7 @@ public class AuthorController {
 
     @PostMapping("/register")
     public ResponseEntity<?> Register(@RequestBody RegisterRequest request) {
-        if (userService.usernameExists(request.username)) {
+        if (userService.usernameExists(request.username)){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
         }
         userService.registerUser(request.username, request.password);

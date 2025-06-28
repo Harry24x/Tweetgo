@@ -6,7 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.Authentication;
 import oth.ics.wtp.tweetgobackend.config.SecurityConfig;
-import oth.ics.wtp.tweetgobackend.controller.AuthorController;
+import oth.ics.wtp.tweetgobackend.controller.AuthController;
 import oth.ics.wtp.tweetgobackend.controller.TweetController;
 import oth.ics.wtp.tweetgobackend.controller.UserController;
 import oth.ics.wtp.tweetgobackend.security.JwtUtil;
@@ -15,7 +15,7 @@ import oth.ics.wtp.tweetgobackend.services.UserService;
 
 // Import your controllers under test
 @SuppressWarnings("ALL")
-@Import({ TweetController.class, UserController.class, AuthorController.class, SecurityConfig.class })
+@Import({ TweetController.class, UserController.class, AuthController.class, SecurityConfig.class })
 public abstract class ControllerTestBase {
     @BeforeEach
     void initMocks() {

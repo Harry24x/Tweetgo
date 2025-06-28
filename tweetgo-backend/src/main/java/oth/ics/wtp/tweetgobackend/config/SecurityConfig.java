@@ -1,18 +1,21 @@
 package oth.ics.wtp.tweetgobackend.config;
 
 import oth.ics.wtp.tweetgobackend.security.JwtFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.*;
+import org.springframework.web.filter.CorsFilter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 
@@ -20,53 +23,83 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-    private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtFilter jwtFilter, UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
-        this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * 1) A global CORS filter that runs at HIGHEST_PRECEDENCE
+     *    so browser OPTIONS preflight and POSTs to /auth/** always work.
+     */
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // apply to all routes
+        source.registerCorsConfiguration("/**", config);
+
+        CorsFilter filter = new CorsFilter(source);
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(filter);
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+
+    /**
+     * 2) The main Spring Security filter chain:
+     *    - disable CSRF (stateless API)
+     *    - stateless session management
+     *    - authorize OPTIONS/** and /auth/** anonymously
+     *    - protect all other endpoints
+     *    - insert the JWT filter
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // a) Unblock all CORS preflights
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // b) Allow anonymous access to all /auth/** endpoints
+                        .requestMatchers("/auth/**").permitAll()
+
+                        // c) Swagger, health, ping
                         .requestMatchers(
-                                "/api/auth/**",
                                 "/ping",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/webjars/**").permitAll()
+                                "/webjars/**"
+                        ).permitAll()
+
+                        // d) Everything else requires a valid JWT
                         .anyRequest().authenticated()
                 )
+                // e) Hook in your JWT validation filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    /**
+     * 3) Expose the AuthenticationManager, so you can @Autowired it in your AuthController.
+     */
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173"));
-        cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
-        cfg.setAllowedHeaders(Arrays.asList("Authorization","Content-Type"));
-        cfg.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
-        src.registerCorsConfiguration("/**", cfg);
-        return src;
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
-
+    /**
+     * 4) A BCryptPasswordEncoder bean for hashing new user passwords in your UserService.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
