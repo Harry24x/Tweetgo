@@ -49,9 +49,6 @@ public class TweetService {
         }
         return tweetRepository.save(newtweet);
     }
-
-
-
     public TweetDto maptweetToDto(Tweet tweet, User currentUser) {
         if (tweet == null) return null;
 

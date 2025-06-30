@@ -1,20 +1,32 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../axios";
+import { AuthContext } from "../Context/AuthContext";
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [msg, setMsg] = useState("");
+    const [msg, setMsg]         = useState("");
+    const { login } = useContext(AuthContext);
+    const navigate              = useNavigate();
 
-    const handleLogin = async e => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await API.post("/auth/login", { username, password });
+            const res   = await API.post("/auth/login", { username, password });
+            login(res.data.token);
             const token = res.data.token;
             localStorage.setItem("jwt", token);
-            setMsg("✅ Logged IN");
+
+            setMsg("✅ Logged in successfully! Redirecting…");
+            // give the user a moment to read the msg
+            setTimeout(() => {
+                navigate("/feed");      // <-- redirect to Homepage
+            }, 500);
         } catch (err) {
-            setMsg("❌ Login failed: " + (err.response?.data || err.message));
+            // show either the server’s message or a fallback
+            const errorText = err.response?.data || err.message;
+            setMsg(`❌ Login failed: ${errorText}`);
         }
     };
 

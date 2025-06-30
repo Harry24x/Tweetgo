@@ -1,29 +1,27 @@
 import React, { createContext, useState, useEffect } from "react";
 
-// Create AuthContext to hold JWT token and updater
-export const AuthContext = createContext({
-    token: null,
-    setToken: () => {}
-});
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext(null);
 
-// Provider component to wrap the app
-export function AuthProvider({ children }) {
-    // Initialize token from localStorage if present
-    const [token, setToken] = useState(() => {
-        return localStorage.getItem("jwt") || null;
-    });
+export default function AuthProvider({ children }) {
+    const [token, setToken] = useState(null);
 
-    // Side effect: whenever token changes, sync to localStorage
+    // on page refresh keep token
     useEffect(() => {
-        if (token) {
-            localStorage.setItem("jwt", token);
-        } else {
-            localStorage.removeItem("jwt");
-        }
-    }, [token]);
+        setToken(localStorage.getItem("jwt"));
+    }, []);
+
+    const login = (t) => {
+        localStorage.setItem("jwt", t);
+        setToken(t);
+    };
+    const logout = () => {
+        localStorage.removeItem("jwt");
+        setToken(null);
+    };
 
     return (
-        <AuthContext.Provider value={{ token, setToken }}>
+        <AuthContext.Provider value={{ token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

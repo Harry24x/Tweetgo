@@ -1,5 +1,7 @@
 package oth.ics.wtp.tweetgobackend.config;
 
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import oth.ics.wtp.tweetgobackend.security.JwtFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 
 @Configuration
+@EnableWebSecurity
 public class  SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -38,6 +41,7 @@ public class  SecurityConfig {
         config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
+        config.setExposedHeaders(Arrays.asList("Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -49,26 +53,20 @@ public class  SecurityConfig {
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
     }
-
-    /**
-     * 2) The main Spring Security filter chain:
-     *    - disable CSRF (stateless API)
-     *    - stateless session management
-     *    - authorize OPTIONS/** and /auth/** anonymously
-     *    - protect all other endpoints
-     *    - insert the JWT filter
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // a) Unblock all CORS preflights
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/tweet").permitAll()
+                        // and also allow the GET /tweet/feed:
+                        .requestMatchers(HttpMethod.GET, "/tweet/**").permitAll()
 
                         // b) Allow anonymous access to all /auth/** endpoints
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/auth/**", "/ping").permitAll()
 
                         // c) Swagger, health, ping
                         .requestMatchers(

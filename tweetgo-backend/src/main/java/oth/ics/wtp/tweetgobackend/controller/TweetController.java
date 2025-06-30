@@ -9,11 +9,10 @@ import oth.ics.wtp.tweetgobackend.Dto.TweetCreationDto;
 import oth.ics.wtp.tweetgobackend.Dto.TweetDto;
 import oth.ics.wtp.tweetgobackend.services.TweetService;
 import oth.ics.wtp.tweetgobackend.Entities.Tweet;
-
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tweet")
+@RequestMapping("/tweet")
 public class TweetController {
 
     private final TweetService tweetService;
@@ -24,17 +23,18 @@ public class TweetController {
     }
 
     // ← Add this annotation so the endpoint is exposed
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createTweet(
-            @RequestPart("tweetData") TweetCreationDto tweetDto,
-            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
-            Authentication authentication) {
+            @RequestBody TweetCreationDto dto,
 
-        String username = authentication.getName();
+            Authentication auth
+    ) {
         try {
-            Tweet newTweet = tweetService.createtweet(tweetDto, username, imageFile);
-            TweetDto responseDto = tweetService.maptweetToDto(newTweet, null);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+            String username = auth.getName();
+            // pass `null` for imageFile until you build an upload UI
+            Tweet saved = tweetService.createtweet(dto, username, null);
+            TweetDto out = tweetService.maptweetToDto(saved, null);
+            return ResponseEntity.status(HttpStatus.CREATED).body(out);
         } catch (Exception e) {
             return ResponseEntity
                     .badRequest()
@@ -42,35 +42,38 @@ public class TweetController {
         }
     }
 
+
     @GetMapping("/feed")
-    public List<TweetDto> getTimelineFeed(Authentication authentication) {
-        return tweetService.getAggregatedTimeline(authentication.getName());
+    public ResponseEntity<List<TweetDto>> getFeed(Authentication auth) {
+        List<TweetDto> feed = tweetService.getAggregatedTimeline(auth.getName());
+        return ResponseEntity.ok(feed);
     }
 
     @GetMapping("/user/{username}")
-    public List<TweetDto> getTweetsByUsername(
+    public ResponseEntity<List<TweetDto>> getByUser(
             @PathVariable String username,
-            Authentication authentication) {
-
-        String currentUser = authentication != null ? authentication.getName() : null;
-        return tweetService.gettweetsByUsername(username, currentUser);
+            Authentication auth
+    ) {
+        String current = auth != null ? auth.getName() : null;
+        List<TweetDto> tweets = tweetService.gettweetsByUsername(username, current);
+        return ResponseEntity.ok(tweets);
     }
 
     @PostMapping("/{tweetId}/like")
     public ResponseEntity<String> likeTweet(
             @PathVariable Long tweetId,
-            Authentication authentication) {
+            Authentication auth) {
 
-        tweetService.liketweet(tweetId, authentication.getName());
+        tweetService.liketweet(tweetId, auth.getName());
         return ResponseEntity.ok("Tweet liked successfully.");
     }
 
     @DeleteMapping("/{tweetId}/unlike")
     public ResponseEntity<String> unlikeTweet(
             @PathVariable Long tweetId,
-            Authentication authentication) {
+            Authentication auth) {
 
-        tweetService.unliketweet(tweetId, authentication.getName());
+        tweetService.unliketweet(tweetId, auth.getName());
         return ResponseEntity.ok("Tweet unliked successfully.");
     }
 }
