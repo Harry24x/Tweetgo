@@ -18,11 +18,9 @@ import org.springframework.web.cors.*;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
-@EnableWebSecurity
 public class  SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -30,22 +28,16 @@ public class  SecurityConfig {
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
-
-    /**
-     * 1) A global CORS filter that runs at HIGHEST_PRECEDENCE
-     *    so browser OPTIONS preflight and POSTs to /auth/** always work.
-     */
     @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
+    public FilterRegistrationBean<CorsFilter> corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
-        config.setExposedHeaders(Arrays.asList("Authorization"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // apply to all routes
         source.registerCorsConfiguration("/**", config);
 
         CorsFilter filter = new CorsFilter(source);
@@ -57,13 +49,13 @@ public class  SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // a) Unblock all CORS preflights
-                        .requestMatchers(HttpMethod.POST, "/tweet").permitAll()
-                        // and also allow the GET /tweet/feed:
-                        .requestMatchers(HttpMethod.GET, "/tweet/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,   "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,    "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,    "/api/tweet/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,   "/api/tweet/**").authenticated()
 
                         // b) Allow anonymous access to all /auth/** endpoints
                         .requestMatchers("/auth/**", "/api/auth/**", "/ping").permitAll()
@@ -77,9 +69,6 @@ public class  SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-
-                        // d) Everything else requires a valid JWT
-                        .anyRequest().authenticated()
                 )
                 // e) Hook in your JWT validation filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

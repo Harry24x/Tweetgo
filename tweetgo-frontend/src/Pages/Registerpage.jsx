@@ -13,7 +13,7 @@ export default function Registerpage() {
             return setMsg("❌ Passwords do not match");
         }
         try {
-            await API.post("/auth/register", {
+            await API.post("/api/auth/register", {
                 username: form.username,
                 password: form.password
             });

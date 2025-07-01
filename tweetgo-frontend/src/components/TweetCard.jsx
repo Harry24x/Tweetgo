@@ -7,8 +7,8 @@ export default function TweetCard({ tweet }) {
 
     const toggle = () => {
         const call = liked
-            ? API.delete(`/tweet/${tweet.id}/unlike`)
-            : API.post(`/tweet/${tweet.id}/like`);
+            ? API.delete(`/api/tweet/${tweet.id}/unlike`)
+            : API.post(`/api/tweet/${tweet.id}/like`);
         call.then(() => {
             setLiked(!liked);
             setCount(count + (liked ? -1 : 1));

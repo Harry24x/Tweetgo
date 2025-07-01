@@ -13,7 +13,7 @@ export default function LoginPage() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res   = await API.post("/auth/login", { username, password });
+            const res   = await API.post("/api/auth/login", { username, password });
             login(res.data.token);
             const token = res.data.token;
             localStorage.setItem("jwt", token);

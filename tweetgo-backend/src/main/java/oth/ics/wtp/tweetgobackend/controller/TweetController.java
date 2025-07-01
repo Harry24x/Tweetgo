@@ -12,7 +12,8 @@ import oth.ics.wtp.tweetgobackend.Entities.Tweet;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tweet")
+@RequestMapping("/api/tweet")
+@CrossOrigin(origins = "http://localhost:5173")
 public class TweetController {
 
     private final TweetService tweetService;
