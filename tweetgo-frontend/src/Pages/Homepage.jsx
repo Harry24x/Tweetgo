@@ -2,9 +2,11 @@ import React, { useEffect, useState, useContext } from "react";
 import API from "../axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Context/AuthContext";
+import { Link } from "react-router-dom";
+
 
 export default function Homepage() {
-    const { logout } = useContext(AuthContext);
+    const { logout , token } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const [feed, setFeed] = useState(null);
@@ -13,14 +15,18 @@ export default function Homepage() {
     const [posting, setPosting] = useState(false);
 
     useEffect(() => {
-        API.get("/api/tweet/feed")
-            .then((res) => setFeed(res.data))
-            .catch((err) => {
+        if (!token) return setFeed([]);
+
+        setFeed(null);
+        API.get("/api/tweet/feed")   // <-- this must match your controller path!
+            .then(res => setFeed(res.data))
+            .catch(err => {
                 console.error(err);
                 setError("Could not load feed.");
                 setFeed([]);
             });
-    }, []);
+    }, [token]);
+
 
     // Logout
     const handleLogout = () => {
@@ -39,7 +45,7 @@ export default function Homepage() {
             setFeed([resp.data, ...feed]);
             setNewText("");
         } catch (err) {
-            console.error("POST /api/tweet failed:", err.response || err);
+            console.error("POST tweet failed:", err.response || err);
             setError("Could not post tweet.");
         } finally {
             setPosting(false);
@@ -52,7 +58,8 @@ export default function Homepage() {
             {/* Navbar */}
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
                 <div className="container">
-                    <a className="navbar-brand d-flex align-items-center" href="/">
+
+                    <Link className="navbar-brand d-flex align-items-center" to="/feed">
                         <img
                             src="/logo192.png"
                             alt="TweetGo"
@@ -61,7 +68,18 @@ export default function Homepage() {
                             className="me-2 rounded-circle"
                         />
                         <span className="fs-4">TweetGo</span>
-                    </a>
+                    </Link>
+                    <div className="collapse navbar-collapse">
+                        <ul className="navbar-nav me-auto">
+                            <li className="nav-item">
+                                <Link to="/discover" className="nav-link">Discover</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/profile" className="nav-link">My Profile</Link>
+                            </li>
+                        </ul>
+                    </div>
+
                     <button
                         className="btn btn-outline-light"
                         onClick={handleLogout}
@@ -77,7 +95,7 @@ export default function Homepage() {
                 <div className="card mb-4 shadow-sm">
                     <div className="card-body">
                         <form onSubmit={handlePost}>
-                            <div className="d-flex align-items-start">
+                        <div className="d-flex align-items-start">
                                 <img
                                     src="/avatar-placeholder.png"
                                     alt="Your avatar"
@@ -136,7 +154,7 @@ export default function Homepage() {
                 {/* Empty */}
                 {Array.isArray(feed) && feed.length === 0 && !error && (
                     <p className="text-center text-muted fs-5">
-                        No tweets to display.
+                        Nothing to show
                     </p>
                 )}
 
@@ -175,7 +193,7 @@ export default function Homepage() {
                                                 method: tweet.likedByCurrentUser
                                                     ? "delete"
                                                     : "post",
-                                                url: `/tweet/${tweet.id}/${
+                                                url: `/api/tweet/${tweet.id}/${
                                                     tweet.likedByCurrentUser ? "unlike" : "like"
                                                 }`,
                                             });

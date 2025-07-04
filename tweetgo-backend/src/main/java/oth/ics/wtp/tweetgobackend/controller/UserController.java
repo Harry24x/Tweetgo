@@ -1,5 +1,7 @@
 package oth.ics.wtp.tweetgobackend.controller;
 
+import oth.ics.wtp.tweetgobackend.Dto.UserProfileDto;
+import oth.ics.wtp.tweetgobackend.Entities.User;
 import oth.ics.wtp.tweetgobackend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDto>> searchUsers(@RequestParam("q") String query, Authentication authentication) {
+        String currentUsername = authentication != null ? authentication.getName() : null;
+        // We need a new service method that returns DTOs
+        List<UserDto> users = userService.searchUsers(query, currentUsername);
+        return ResponseEntity.ok(users);
+    }
+
     @PostMapping("/{username}/follow")
     public ResponseEntity<?> followUser(@PathVariable String username, Authentication authentication) {
         String currentUsername = authentication.getName();
@@ -35,13 +45,6 @@ public class UserController {
         userService.unfollowUser(currentUsername, username);
         return ResponseEntity.ok().body("Successfully unfollowed " + username);
     }
-    @GetMapping("/search")
-    public ResponseEntity<List<UserDto>> searchUsers(@RequestParam("q") String query, Authentication authentication) {
-        String currentUsername = authentication.getName();
-        // We need a new service method that returns DTOs
-        List<UserDto> users = userService.searchUsers(query, currentUsername);
-        return ResponseEntity.ok(users);
-    }
 
     @GetMapping("/{username}")
     public ResponseEntity<UserDto> getUserProfile(@PathVariable String username, Authentication authentication) {
@@ -49,6 +52,19 @@ public class UserController {
         UserDto userProfile = userService.getUserProfile(username, currentUsername);
         return ResponseEntity.ok(userProfile);
     }
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileDto> getMyProfile(Authentication auth) {
+        String me = auth.getName();
+        User user = userService.findByUsername(me);
+        UserProfileDto dto = userService.toProfileDto(user);
+        return ResponseEntity.ok(dto);
+    }
+    @PutMapping("/me")
+    public ResponseEntity<?> updateMyProfile(
+            @RequestBody UserProfileDto profile,
+            Authentication auth
+    ) {
+        String me = auth.getName();   userService.updateProfile(me, profile.fullName, profile.email, profile.bio);
 
-    // We will add the /search endpoint here in a later step.
+        return ResponseEntity.noContent().build();}
 }

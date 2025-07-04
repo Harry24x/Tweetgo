@@ -3,14 +3,17 @@ package oth.ics.wtp.tweetgobackend.services;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oth.ics.wtp.tweetgobackend.Dto.UserDto;
+import oth.ics.wtp.tweetgobackend.Dto.UserProfileDto;
 import oth.ics.wtp.tweetgobackend.Entities.User;
 import oth.ics.wtp.tweetgobackend.repositories.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -37,7 +40,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
+    public User findByUsername(String username) {
+        Optional<User> opt = userRepository.findByUsername(username);
+        return opt.orElseThrow(
+                () -> new RuntimeException("User not found: " + username)
+        );
+    }
     public void followUser(String followerUsername, String targetUsername) {
         User follower = userRepository.findByUsername(followerUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + followerUsername));
@@ -63,6 +71,14 @@ public class UserService {
     private UserDto mapUserToDto(User user) {
         return mapUserToDto(user, null);
     }
+    public UserProfileDto toProfileDto(User u) {
+        UserProfileDto dto = new UserProfileDto();
+        dto.username = u.getUsername();
+        dto.fullName = u.getFullName();
+        dto.email    = u.getEmail();
+        dto.bio      = u.getBio();
+        return dto;
+    }
 
     @Transactional(readOnly = true)
     public UserDto getUserProfile(String username, String currentUsername) {
@@ -78,4 +94,14 @@ public class UserService {
         dto.setFollowersCount(user.getFollowers().size());
         dto.setFollowingCount(user.getFollowing().size());
         return dto;}
+    public void updateProfile(String username, String fullName, String email, String bio) {
+        User u = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+        // optionally: check if email unique etc.
+        u.setFullName(fullName);
+        u.setEmail(email);
+        u.setBio(bio);
+        userRepository.save(u);
+    }
+
 }

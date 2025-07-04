@@ -10,7 +10,7 @@ const API = axios.create({
 // Interceptor: runs before every request
 API.interceptors.request.use((config) => {
     const token = localStorage.getItem("jwt");   // your login stored this
-    if (token) {
+    if (token && !config.url.includes("/api/auth")) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
