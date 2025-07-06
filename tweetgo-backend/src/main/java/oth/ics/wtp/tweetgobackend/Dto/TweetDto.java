@@ -1,6 +1,7 @@
 package oth.ics.wtp.tweetgobackend.Dto;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class TweetDto {
     private Long id;
@@ -8,8 +9,10 @@ public class TweetDto {
     private LocalDateTime timestamp;
     private String authorUsername;
     private int likesCount;
+    private int commentsCount;
     private boolean likedByCurrentUser;
     private String imageUrl; // if you include images
+    private Set<String> hashtags;
 
     public TweetDto() {}
 
@@ -48,6 +51,13 @@ public class TweetDto {
         this.likesCount = likesCount;
     }
 
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
     public boolean isLikedByCurrentUser() {
         return likedByCurrentUser;
     }
@@ -60,5 +70,12 @@ public class TweetDto {
     }
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public Set<String> getHashtags() {
+        return hashtags;
+    }
+    public void setHashtags(Set<String> hashtags) {
+        this.hashtags = hashtags;
     }
 }

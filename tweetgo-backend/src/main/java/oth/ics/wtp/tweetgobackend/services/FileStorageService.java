@@ -17,8 +17,7 @@ public class FileStorageService {
     private final Path fileStorageLocation;
 
     public FileStorageService() {
-        // Define the location where files will be stored.
-        // 'user.dir' is the root of your Spring Boot project.
+
         this.fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
 
         try {
@@ -36,7 +35,7 @@ public class FileStorageService {
         } catch(Exception e) {
             fileExtension = "";
         }
-        // Create a unique filename to avoid conflicts
+
         String fileName = UUID.randomUUID().toString() + fileExtension;
 
         try {
@@ -49,7 +48,6 @@ public class FileStorageService {
                 Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // Return the filename to be stored in the database
             return fileName;
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);

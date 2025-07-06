@@ -12,5 +12,4 @@ public class LoginResponseDto {
         private String tokenType = "Bearer";
 
 
-}//o	I also began defining Data Transfer Objects (DTOs) like UserRegistrationDto,
-// UserLoginDto, and PostCreationDto to handle data transfer between layers
+}

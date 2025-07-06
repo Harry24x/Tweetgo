@@ -2,6 +2,7 @@ package oth.ics.wtp.tweetgobackend.repositories;
 
 import oth.ics.wtp.tweetgobackend.Entities.Tweet;
 import oth.ics.wtp.tweetgobackend.Entities.User;
+import oth.ics.wtp.tweetgobackend.Entities.Hashtag;
 import org.springframework.data.domain.Pageable; // For pagination (at most 20 posts)
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,5 +23,8 @@ public interface TweetRepository extends JpaRepository<Tweet, Long> {
     @Query("SELECT p FROM Tweet p WHERE p.author IN :authors ORDER BY p.timestamp DESC")
     List<Tweet> findPostsByAuthors(@Param("authors") List<User> authors, Pageable pageable);
 
+
+    @Query("SELECT DISTINCT t FROM Tweet t JOIN t.hashtags h WHERE h.name = :hashtagName ORDER BY t.timestamp DESC")
+    List<Tweet> findByHashtagName(@Param("hashtagName") String hashtagName, Pageable pageable);
 
 }

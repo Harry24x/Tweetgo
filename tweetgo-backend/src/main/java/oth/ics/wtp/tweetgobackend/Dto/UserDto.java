@@ -2,13 +2,19 @@ package oth.ics.wtp.tweetgobackend.Dto;
 
 public class UserDto {
     private String username;
+    private String password;
     private int followersCount;
     private int followingCount;
     private boolean followedByCurrentUser; // optional
 
     public UserDto() {}
 
-    // username
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String username) {
+        this.password = password;
+    }
     public String getUsername() {
         return username;
     }

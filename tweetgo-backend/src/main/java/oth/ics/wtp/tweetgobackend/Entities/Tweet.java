@@ -37,6 +37,17 @@ public class Tweet {
     )
     private Set<User> likedByUsers = new HashSet<>();
 
+    @OneToMany(mappedBy = "tweet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "tweet_hashtags",
+            joinColumns = @JoinColumn(name = "tweet_id"),
+            inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+    )
+    private Set<Hashtag> hashtags = new HashSet<>();
+
     @Column
     private String imageUrl;
 
@@ -48,14 +59,16 @@ public class Tweet {
     }
 
     @PrePersist
-    protected void onCreate() {
+    public void onCreate() {
         this.timestamp = LocalDateTime.now();
     }
 
-    // --- Getters & Setters ---
 
     public Long getId() {
         return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getText() {
@@ -67,6 +80,9 @@ public class Tweet {
 
     public LocalDateTime getTimestamp() {
         return timestamp;
+    }
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 
     public User getAuthor() {
@@ -89,6 +105,39 @@ public class Tweet {
         likedByUsers.remove(user);
     }
 
+    public Set<Comment> getComments() {
+        return comments;
+    }
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
+    public int getCommentsCount() {
+        return comments.size();
+    }
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setTweet(this);
+    }
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+        comment.setTweet(null);
+    }
+
+    public Set<Hashtag> getHashtags() {
+        return hashtags;
+    }
+    public void setHashtags(Set<Hashtag> hashtags) {
+        this.hashtags = hashtags;
+    }
+    public void addHashtag(Hashtag hashtag) {
+        hashtags.add(hashtag);
+        hashtag.getTweets().add(this);
+    }
+    public void removeHashtag(Hashtag hashtag) {
+        hashtags.remove(hashtag);
+        hashtag.getTweets().remove(this);
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -96,7 +145,7 @@ public class Tweet {
         this.imageUrl = imageUrl;
     }
 
-    // --- equals/hashCode based on id ---
+
 
     @Override
     public boolean equals(Object o) {
@@ -120,6 +169,7 @@ public class Tweet {
                 ", timestamp=" + timestamp +
                 ", author=" + (author != null ? author.getUsername() : "null") +
                 ", likesCount=" + getLikesCount() +
+                ", commentsCount=" + getCommentsCount() +
                 '}';
     }
 }

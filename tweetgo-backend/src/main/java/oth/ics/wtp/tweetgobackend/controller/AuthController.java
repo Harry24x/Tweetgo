@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import oth.ics.wtp.tweetgobackend.Dto.AuthorResponse;
 import oth.ics.wtp.tweetgobackend.Dto.LoginRequest;
 import oth.ics.wtp.tweetgobackend.Dto.RegisterRequest;
@@ -28,7 +29,7 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<?> Register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> Register(@Valid @RequestBody RegisterRequest request) {
         if (userService.usernameExists(request.username)){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
         }
@@ -37,10 +38,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthorResponse> login(@RequestBody LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.username, request.password));
-        String token = jwtUtil.generateToken(request.username);
-        return ResponseEntity.ok(new AuthorResponse(token));
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.username, request.password));
+            String token = jwtUtil.generateToken(request.username);
+            return ResponseEntity.ok(new AuthorResponse(token));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid username or password");
+        }
     }
 }

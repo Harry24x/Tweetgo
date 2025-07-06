@@ -1,53 +1,22 @@
+
+:root {
+  --neon-green: #1da1f2;      /* primary Twitter blue */
+  --neon-blue:  #657786;      /* secondary text color */
+  --neon-purple: #f5f8fa;     /* background cards */
+  --neon-pink:   #ffffff;     /* default page bg */
+  --neon-orange: #e1e8ed;     /* borders */
+  --dark-bg:     #ffffff;     /* overall page */
+  --darker-bg:   #f5f8fa;     /* card backgrounds */
+  --grid-bg:     #e1e8ed;     /* subtle grid lines */
+  --text-primary:#14171a;     /* primary text */
+  --text-secondary:#657786;    /* secondary text */
+  --accent-glow: none;
+  --box-shadow:  0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background-color: #f5f8fa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--neon-pink);
+  color: var(--text-primary);
 }
 
-header {
-  background-color: #1da1f2;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
-
-.tweet-box {
-  padding: 1rem;
-  border-bottom: 1px solid #ccc;
-}
-
-.tweet-box textarea {
-  width: 100%;
-  height: 60px;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.tweet-box button {
-  background-color: #1da1f2;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.feed {
-  padding: 1rem;
-}
-
-.tweet {
-  background: white;
-  border: 1px solid #e1e8ed;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 10px;
-}
-
-footer {
-  text-align: center;
-  padding: 1rem;
-  font-size: 0.9em;
-  color: #657786;
-}

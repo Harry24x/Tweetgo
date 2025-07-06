@@ -27,7 +27,6 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public boolean usernameExists(String username) {
-
         return userRepository.existsByUsername(username);
     }
 
@@ -37,26 +36,39 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
+    @Transactional
     public void followUser(String followerUsername, String targetUsername) {
         User follower = userRepository.findByUsername(followerUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + followerUsername));
         User target = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetUsername));
+        
+        if (follower.equals(target)) {
+            throw new IllegalArgumentException("You cannot follow yourself.");
+        }
+        
+        follower.followUser(target);
+        userRepository.save(follower);
+        userRepository.save(target);
     }
 
+    @Transactional
     public void unfollowUser(String followerUsername, String targetUsername) {
         User follower = userRepository.findByUsername(followerUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + followerUsername));
         User target = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetUsername));
+        
+        follower.unfollowUser(target);
+        userRepository.save(follower);
+        userRepository.save(target);
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> searchUsers(String query, String currentUsername) {
-        return userRepository.findByUsername(query).stream()
+        return userRepository.findByUsernameContaining(query).stream()
                 .filter(u -> !u.getUsername().equals(currentUsername))
-                .map(user -> mapUserToDto(user))
+                .map(user -> mapUserToDto(user, currentUsername))
                 .collect(Collectors.toList());
     }
 
@@ -68,14 +80,39 @@ public class UserService {
     public UserDto getUserProfile(String username, String currentUsername) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
-        User currentUser = userRepository.findByUsername(currentUsername).orElse(null);
-        return mapUserToDto(user, currentUser);
+        return mapUserToDto(user, currentUsername);
+    }
+    @Transactional
+    public UserDto updateProfile(String username, UserDto update) {
+        // 1. load the existing user
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+
+
+        if (update.getPassword() != null && !update.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(update.getPassword()));
+        }
+
+
+        // 3. save and return a fresh DTO
+        userRepository.save(user);
+        return mapUserToDto(user, username);
     }
 
-    private UserDto mapUserToDto(User user, User currentUser) {
+
+    private UserDto mapUserToDto(User user, String currentUsername) {
         UserDto dto = new UserDto();
         dto.setUsername(user.getUsername());
         dto.setFollowersCount(user.getFollowers().size());
         dto.setFollowingCount(user.getFollowing().size());
-        return dto;}
+        
+        if (currentUsername != null && !currentUsername.equals(user.getUsername())) {
+            User currentUser = userRepository.findByUsername(currentUsername).orElse(null);
+            if (currentUser != null) {
+                dto.setFollowedByCurrentUser(currentUser.getFollowing().contains(user));
+            }
+        }
+        
+        return dto;
+    }
 }

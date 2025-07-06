@@ -24,13 +24,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    // --- Relationships ---
 
-    // A user’s own tweets
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tweet> posts = new ArrayList<>();
 
-    // The users this user is following
+
     @ManyToMany
     @JoinTable(
             name = "user_following_map",
@@ -39,7 +37,6 @@ public class User implements UserDetails {
     )
     private Set<User> following = new HashSet<>();
 
-    // The users who follow this user
     @ManyToMany(mappedBy = "following")
     private Set<User> followers = new HashSet<>();
 
@@ -50,10 +47,12 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    // --- Accessors & Mutators ---
 
     public Long getId() {
         return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override
@@ -84,7 +83,7 @@ public class User implements UserDetails {
         return followers;
     }
 
-    // --- Helper methods ---
+
 
     public void addPost(Tweet post) {
         posts.add(post);
@@ -105,8 +104,6 @@ public class User implements UserDetails {
         following.remove(other);
         other.followers.remove(this);
     }
-
-    // --- UserDetails methods ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

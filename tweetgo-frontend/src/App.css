@@ -1,0 +1,312 @@
+ {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #ffffff;
+  color: #0f1419;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: #0f1419;
+  font-weight: 600;
+}
+p, span, small {
+  color: #0f1419;
+}
+
+a {
+  color: #1da1f2;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e6ecf0 !important;
+}
+.navbar .navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1da1f2 !important;
+}
+.navbar .btn-outline-light {
+  color: #1da1f2 !important;
+  border-color: #1da1f2 !important;
+}
+.navbar .btn-outline-light:hover {
+  background-color: #1da1f2 !important;
+  color: #ffffff !important;
+}
+
+/* Cards */
+.card {
+  background-color: #ffffff;
+  border: 1px solid #e6ecf0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(15, 20, 25, 0.1);
+}
+
+.card-header, .card-footer {
+  background-color: #ffffff;
+  border-color: #e6ecf0;
+}
+
+.card-header h6 {
+  font-weight: 600;
+  color: #0f1419;
+}
+.card-header small {
+  color: #657786;
+}
+
+/* Forms and Inputs */
+input, textarea, select, button {
+  font-family: inherit;
+}
+input.form-control, textarea.form-control {
+  border: 1px solid #e6ecf0;
+  border-radius: 8px;
+}
+
+button.btn-primary {
+  background-color: #1da1f2 !important;
+  border-color: #1da1f2 !important;
+  border-radius: 20px;
+}
+button.btn-primary:hover {
+  background-color: #0d95e8 !important;
+}
+
+/* Alerts */
+.alert-success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+.alert-danger {
+  background-color: #ffebee;
+  color: #c62828;
+  border-color: #ffcdd2;
+}
+
+/* Tweet Feed */
+.tweet-card, .tweet-creation, .comment, .comment-card {
+  background-color: #ffffff;
+  border: 1px solid #e6ecf0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.tweet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.author {
+  font-weight: 600;
+  color: #0f1419;
+}
+.timestamp, .comment-timestamp, .tweet-meta span {
+  color: #657786;
+  font-size: 0.85rem;
+}
+
+.tweet-content p, .comment-text {
+  color: #0f1419;
+  line-height: 1.6;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: #657786;
+  cursor: pointer;
+}
+.action-btn:hover {
+  color: #1da1f2;
+}
+.action-btn.liked {
+  color: #e0245e;
+}
+
+/* Footer */
+footer {
+  background-color: #ffffff;
+  border-top: 1px solid #e6ecf0;
+  padding: 1rem;
+  text-align: center;
+  color: #657786;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  .cyber-nav {
+    background: #ffffff;
+    border-bottom: 1px solid #e6ecf0;
+    height: 60px;
+    padding: 0 2rem;
+  }
+
+  .cyber-nav .brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1da1f2;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    margin-left: 1.5rem;
+    color: #657786;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-link svg {
+    margin-right: 0.5rem;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: #1da1f2;
+  }
+
+  .logout-btn {
+    margin-left: 2rem;
+    background: transparent;
+    border: 1px solid #e6ecf0;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .logout-btn svg {
+    margin-right: 0.25rem;
+  }
+
+  .logout-btn:hover {
+    background: #e8f5fd;
+    border-color: #1da1f2;
+  }
+  .cyber-nav {
+    background: #000;
+    color: #0ff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      z-index: 1000;
+     }
+  .cyber-nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+  }
+
+  /* brand + menu-button row */
+  .brand-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /* ← make brand on left, toggle on right */
+    width: 100%;                     /* ← span the entire nav width */
+  }
+
+  /* the “TWEETGO” brand */
+  .brand {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #0ff;
+    text-decoration: none;
+  }
+
+  /* hide the real links on mobile */
+  .links {
+    display: flex;
+    gap: 1rem;
+  }
+
+  /* toggle button is hidden by default */
+  .toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: #0ff;
+  }
+
+  /* Link styles */
+  .link {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #0ff;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .link.logout {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  /* Mobile breakpoint */
+  @media (max-width: 768px) {
+    /* show hamburger */
+    .toggle-btn {
+      display: block;
+    }
+    /* hide links until open */
+    .links {
+      position: absolute;
+      top: 60px;   /* adjust to nav height */
+      left: 0;
+      right: 0;
+      background: #0080ff;
+      flex-direction: column;
+      align-items: stretch;
+      display: none;
+      padding: 0.5rem 1rem;
+    }
+    /* when open, show them */
+    .links.open {
+      display: flex;
+    }
+    .links .link {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #0d95e8;
+    }
+    .links .link:last-child {
+      border-bottom: none;
+    }
+  }
+
+
+}
