@@ -28,6 +28,15 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tweet> posts = new ArrayList<>();
 
+    @Column(length=100)
+    private String fullName;
+
+    @Column(length=200)
+    private String address;
+
+    @Column(length=500)
+    private String bio;
+
 
     @ManyToMany
     @JoinTable(
@@ -126,4 +135,13 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
 }

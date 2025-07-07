@@ -5,7 +5,11 @@ public class UserDto {
     private String password;
     private int followersCount;
     private int followingCount;
-    private boolean followedByCurrentUser; // optional
+    private boolean followedByCurrentUser;
+    private String fullName;
+    private String address;
+    private String bio;
+    private boolean isMe;
 
     public UserDto() {}
 
@@ -45,5 +49,14 @@ public class UserDto {
     public void setFollowedByCurrentUser(boolean followedByCurrentUser) {
         this.followedByCurrentUser = followedByCurrentUser;
     }
+
+    public String getBio() {
+    return bio;}
+
+    public String getAddress() {
+        return address;}
+
+    public String getFullName() {
+    return fullName;}
 }
 

@@ -87,12 +87,18 @@ public class UserService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
-
-
         if (update.getPassword() != null && !update.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(update.getPassword()));
         }
-
+        if (update.getFullName() != null) {
+            user.setFullName(update.getFullName());
+        }
+        if (update.getAddress() != null) {
+            user.setAddress(update.getAddress());
+        }
+        if (update.getBio() != null) {
+            user.setBio(update.getBio());
+        }
         userRepository.save(user);
         return mapUserToDto(user, username);
     }
@@ -113,4 +119,5 @@ public class UserService {
         
         return dto;
     }
+
 }

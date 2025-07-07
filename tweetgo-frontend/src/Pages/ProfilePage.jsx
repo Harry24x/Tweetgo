@@ -1,152 +1,220 @@
-import React, { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import axios from '../axios'
-import TweetCard from '../components/TweetCard'
-import CyberNav from '../components/CyberNav'
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import axios from "../axios";
+import CyberNav from "../components/CyberNav";
+import TweetCard from "../components/TweetCard";
 
 function useQuery() {
-  return new URLSearchParams(useLocation().search)
+  return new URLSearchParams(useLocation().search);
 }
 
-export default function ProfilePage() {
-  const query      = useQuery()
-  const userParam  = query.get('user')
-  const [profile, setProfile] = useState(null)
-  const [tweets,  setTweets]  = useState([])
-  const [page,    setPage]    = useState(0)
-  const [hasMore, setHasMore] = useState(true)
-  const [loading, setLoading] = useState(false)
+const ProfilePage = () => {
+  const query = useQuery();
+  const usernameParam = query.get("user");    // ?user=someone
+  const [profile, setProfile] = useState(null);
+  const [tweets, setTweets] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
+  // --- EDIT PROFILE STATES ---
+  const [editMode, setEditMode] = useState(false);
+  const [editValues, setEditValues] = useState({
+    fullName: "",
+    address: "",
+    bio: ""
+  });
+  const isOwnProfile = !usernameParam || usernameParam === profile?.username;
+
+  // Fetch profile whenever usernameParam changes
   useEffect(() => {
-    setPage(0)
-    setTweets([])
-    fetchProfile(userParam)
-  }, [userParam])
+    fetchProfile(usernameParam);
+    setPage(0);
+    setTweets([]);
+  }, [usernameParam]);
 
+  // Fetch tweets whenever profile or page changes
   useEffect(() => {
-    if (profile) loadTweets(profile.username, page)
-  }, [profile, page])
+    if (profile) fetchTweets(profile.username, page);
+  }, [profile, page]);
 
-  async function fetchProfile(uname) {
-    try {
-      const res = await axios.get(`/api/users/${uname || 'me'}`)
-      setProfile(res.data)
-    } catch {
-      setProfile(null)
-    }
-  }
-
-  async function loadTweets(uname, pg) {
-    if (!uname || loading) return
-    setLoading(true)
+  // Fetch profile data + seed editValues
+  const fetchProfile = async (uname) => {
     try {
       const res = await axios.get(
-          `/api/tweet/user/${uname}?page=${pg}`
-      )
-      setTweets(t =>
-          pg === 0 ? res.data : [...t, ...res.data]
-      )
-      setHasMore(res.data.length === 20)
-    } catch { /* empty */ }
-    setLoading(false)
-  }
+          `/api/users/${uname || "me"}`
+      );
+      const data = res.data;
+      setProfile(data);
+      setEditValues({
+        fullName: data.fullName || "",
+        address:  data.address  || "",
+        bio:      data.bio      || ""
+      });
+    } catch {
+      setProfile(null);
+    }
+  };
+
+  // Fetch paginated tweets
+  const fetchTweets = async (username, pg) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const res = await axios.get(
+          `/api/tweet/user/${username}?page=${pg}`
+      );
+      const list = res.data;
+      setTweets(pg === 0 ? list : prev => [...prev, ...list]);
+      setHasMore(list.length === 20);
+    } catch {
+      /* ignore */
+    }
+    setLoading(false);
+  };
+
+  // Delete handler
+  const handleDelete = (tweetId) =>
+      setTweets(prev => prev.filter(t => t.id !== tweetId));
+
+  // Load more tweets
+  const handleLoadMore = () => setPage(p => p + 1);
+
+  // Save edits
+  const handleEditSave = async () => {
+    try {
+      await axios.put('/api/users/me', {
+        fullName: editValues.fullName,
+        address:  editValues.address,
+        bio:      editValues.bio
+      });
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+    }
+  };
 
   if (!profile) {
     return (
-        <>
+        <div className="profile-page">
           <CyberNav />
-          <div className="container py-5 text-center text-secondary">
-            Loading profile…
+          <div className="container py-5 text-center">
+            <h2>Loading profile…</h2>
           </div>
-        </>
-    )
+        </div>
+    );
   }
 
-  return (<div className="container mt-4">
-      <>
+  return (
+      <div className="profile-page">
         <CyberNav />
+        <div className="container py-4">
 
-        <div className="bg-primary" style={{ height: '200px' }}>
-        </div>
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-auto">
-              <div
-                  className="rounded-circle border border-white"
-                  style={{
-                    width: '120px',
-                    height: '120px',
-                    marginTop: '-60px',
-                    backgroundColor: '#ddd',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '36px',
-                    color: '#555'
-                  }}
-              >
-                {profile.username.charAt(0).toUpperCase()}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Profile info */}
-        <div className="container mt-3">
-          <div className="d-flex justify-content-between align-items-start">
-            <div>
-              <h2 className="mb-1">@{profile.username}</h2>
-              <div className="text-muted">
-              <span className="me-3">
-                <strong>{profile.followersCount}</strong> followers
-              </span>
-                <span>
-                <strong>{profile.followingCount}</strong> following
-              </span>
-              </div>
-            </div>
-            {!userParam || userParam === profile.username ? (
-                <button className="btn btn-outline-primary">
+          {/* HEADER */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h1>@{profile.username}</h1>
+            {isOwnProfile && (
+                <button
+                    className="btn btn-outline-primary"
+                    onClick={() => setEditMode(true)}
+                >
                   Edit Profile
                 </button>
-            ) : null}
+            )}
           </div>
 
-          <hr />
+          {/* PROFILE INFO */}
+          <div className="card mb-4">
+            <div className="card-body">
+              {profile.fullName && <h5 className="card-title">{profile.fullName}</h5>}
+              {profile.address  && <p className="card-text">{profile.address}</p>}
+              {profile.bio      && <p className="card-text"><em>{profile.bio}</em></p>}
+              <div className="mt-3 text-muted">
+              <span className="me-4">
+                <strong>{profile.followersCount}</strong> Followers
+              </span>
+                <span>
+                <strong>{profile.followingCount}</strong> Following
+              </span>
+              </div>
+            </div>
+          </div>
 
-          {/* Tweets list */}
+          {/* EDIT PROFILE FORM */}
+          {editMode && (
+              <div className="card mb-4">
+                <div className="card-body">
+                  <h4>Edit Profile</h4>
+                  <div className="mb-3">
+                    <label className="form-label">Full Name</label>
+                    <input
+                        className="form-control"
+                        value={editValues.fullName}
+                        onChange={e => setEditValues(v => ({ ...v, fullName: e.target.value }))}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Address</label>
+                    <input
+                        className="form-control"
+                        value={editValues.address}
+                        onChange={e => setEditValues(v => ({ ...v, address: e.target.value }))}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Bio</label>
+                    <textarea
+                        className="form-control"
+                        rows="3"
+                        value={editValues.bio}
+                        onChange={e => setEditValues(v => ({ ...v, bio: e.target.value }))}
+                    />
+                  </div>
+                  <button
+                      className="btn btn-primary me-2"
+                      onClick={handleEditSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                      className="btn btn-secondary"
+                      onClick={() => setEditMode(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+          )}
+
+          {/* TWEETS LIST */}
+          <h3 className="mb-3">Tweets</h3>
           {tweets.map(t => (
               <TweetCard
                   key={t.id}
                   tweet={t}
-                  onDelete={() =>
-                      setTweets(ts => ts.filter(x => x.id !== t.id))
-                  }
-                  showDelete={
-                      !userParam || userParam === profile.username
-                  }
+                  onDelete={handleDelete}
+                  showDelete={isOwnProfile}
               />
           ))}
 
           {hasMore && (
               <div className="text-center my-4">
                 <button
-                    className="btn btn-primary"
-                    onClick={() => setPage(p => p + 1)}
+                    className="btn btn-outline-primary"
+                    onClick={handleLoadMore}
                     disabled={loading}
                 >
-                  {loading ? 'Loading…' : 'Load More'}
+                  {loading ? "Loading…" : "Load More"}
                 </button>
               </div>
           )}
 
-          {!loading && tweets.length === 0 && (
-              <p className="text-center text-muted my-5">
-                No tweets yet.
-              </p>
+          {tweets.length === 0 && !loading && (
+              <p className="text-center text-muted">No tweets yet.</p>
           )}
+
         </div>
-      </>
       </div>
-  )
-}
+  );
+};
+
+export default ProfilePage;
