@@ -17,7 +17,7 @@ export default function Homepage() {
     if (!token) return setFeed([]);
 
     setFeed(null);
-    API.get("/api/tweet/feed")   // <-- this must match your controller path!
+    API.get("/api/tweet/feed")
         .then(res => setFeed(res.data))
         .catch(err => {
           console.error(err);
@@ -28,8 +28,8 @@ export default function Homepage() {
 
 
   const handleLogout = () => {
-    logout();           // wipe token from context / localStorage
-    navigate("/login"); // step-6: redirect back to login
+    logout();
+    navigate("/login");
   };
 
   const handlePost = async (e) => {
@@ -87,7 +87,6 @@ export default function Homepage() {
             </nav>
 
         <main className="container flex-grow-1 my-4">
-          {/* New Tweet Card */}
           <div className="card mb-4 shadow-sm">
             <div className="card-body">
               <form onSubmit={handlePost}>
@@ -153,7 +152,7 @@ export default function Homepage() {
               </p>
           )}
 
-          {/* Tweet Feed */}
+
           {Array.isArray(feed) &&
               feed.map((tweet) => (
                   <div className="card mb-3 shadow-sm" key={tweet.id}>

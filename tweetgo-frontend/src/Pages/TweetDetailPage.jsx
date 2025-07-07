@@ -13,7 +13,6 @@ const TweetDetailPage = () => {
   const [loading, setLoading] = useState(false);
   const [posting, setPosting] = useState(false);
 
-  // Fetch tweet
   useEffect(() => {
     axios.get(`/api/tweet/${id}`)
         .then(res => setTweet(res.data))
@@ -22,7 +21,6 @@ const TweetDetailPage = () => {
     setComments([]);
   }, [id]);
 
-  // Load comments whenever tweet or page changes
   useEffect(() => {
     if (!tweet) return;
     setLoading(true);
@@ -89,11 +87,10 @@ const TweetDetailPage = () => {
           </div>
         </div>
 
-        {/* Comments */}
         <div className="mb-5">
           <h4>Comments</h4>
 
-          {/* Add Comment */}
+
           <div className="input-group mb-3">
           <textarea
               className="form-control"
@@ -113,12 +110,12 @@ const TweetDetailPage = () => {
             </button>
           </div>
 
-          {/* No comments yet */}
+
           {!loading && comments.length === 0 && (
               <p className="text-muted">No comments yet.</p>
           )}
 
-          {/* Comments List */}
+
           <ul className="list-group">
             {comments.map(c => (
                 <li key={c.id} className="list-group-item">
@@ -133,7 +130,7 @@ const TweetDetailPage = () => {
             ))}
           </ul>
 
-          {/* Load more button */}
+
           {hasMore && (
               <div className="d-grid mt-3">
                 <button

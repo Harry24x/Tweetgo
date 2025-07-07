@@ -1,4 +1,4 @@
- {
+{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -12,7 +12,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Typography */
 h1, h2, h3, h4, h5, h6 {
   color: #0f1419;
   font-weight: 600;
@@ -29,7 +28,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Navbar */
+
 .navbar {
   background-color: #ffffff !important;
   border-bottom: 1px solid #e6ecf0 !important;
@@ -48,7 +47,7 @@ a:hover {
   color: #ffffff !important;
 }
 
-/* Cards */
+
 .card {
   background-color: #ffffff;
   border: 1px solid #e6ecf0;
@@ -70,7 +69,7 @@ a:hover {
   color: #657786;
 }
 
-/* Forms and Inputs */
+
 input, textarea, select, button {
   font-family: inherit;
 }
@@ -88,7 +87,7 @@ button.btn-primary:hover {
   background-color: #0d95e8 !important;
 }
 
-/* Alerts */
+
 .alert-success {
   background-color: #e8f5e9;
   color: #2e7d32;
@@ -100,7 +99,7 @@ button.btn-primary:hover {
   border-color: #ffcdd2;
 }
 
-/* Tweet Feed */
+
 .tweet-card, .tweet-creation, .comment, .comment-card {
   background-color: #ffffff;
   border: 1px solid #e6ecf0;
@@ -141,7 +140,7 @@ button.btn-primary:hover {
   color: #e0245e;
 }
 
-/* Footer */
+
 footer {
   background-color: #ffffff;
   border-top: 1px solid #e6ecf0;
@@ -150,7 +149,7 @@ footer {
   color: #657786;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .container {
     padding: 0.5rem;
@@ -231,15 +230,15 @@ footer {
     padding: 0.5rem 1rem;
   }
 
-  /* brand + menu-button row */
+
   .brand-toggle {
     display: flex;
     align-items: center;
-    justify-content: space-between;  /* ← make brand on left, toggle on right */
-    width: 100%;                     /* ← span the entire nav width */
+    justify-content: space-between;
+    width: 100%;
   }
 
-  /* the “TWEETGO” brand */
+
   .brand {
     font-size: 1.25rem;
     font-weight: bold;
@@ -247,7 +246,7 @@ footer {
     text-decoration: none;
   }
 
-  /* hide the real links on mobile */
+
   .links {
     display: flex;
     gap: 1rem;
@@ -261,7 +260,7 @@ footer {
     color: #0ff;
   }
 
-  /* Link styles */
+
   .link {
     display: flex;
     align-items: center;
@@ -277,16 +276,15 @@ footer {
     padding: 0;
   }
 
-  /* Mobile breakpoint */
   @media (max-width: 768px) {
     /* show hamburger */
     .toggle-btn {
       display: block;
     }
-    /* hide links until open */
+
     .links {
       position: absolute;
-      top: 60px;   /* adjust to nav height */
+      top: 60px;
       left: 0;
       right: 0;
       background: #0080ff;
@@ -295,7 +293,7 @@ footer {
       display: none;
       padding: 0.5rem 1rem;
     }
-    /* when open, show them */
+
     .links.open {
       display: flex;
     }

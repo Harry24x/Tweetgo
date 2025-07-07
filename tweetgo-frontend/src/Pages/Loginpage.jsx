@@ -19,9 +19,9 @@ export default function LoginPage() {
             localStorage.setItem("jwt", token);
 
             setMsg("✅ Logged in successfully! Redirecting…");
-            // give the user a moment to read the msg
+
             setTimeout(() => {
-                navigate("/feed");      // <-- redirect to Homepage
+                navigate("/feed");
             }, 500);
         } catch (err) {
             // show either the server’s message or a fallback
@@ -33,7 +33,6 @@ export default function LoginPage() {
     return (
         <div className="container d-flex align-items-center justify-content-center vh-100">
             <div className="card shadow-sm p-4" style={{ maxWidth: "420px", width: "100%" }}>
-                {/* Logo & Header */}
                 <div className="text-center mb-4">
 
                     <h4 className="fw-bold mb-1">TweetGo</h4>
@@ -41,14 +40,12 @@ export default function LoginPage() {
                     <p className="text-muted">@Harman Bhangu</p>
                 </div>
 
-                {/* Message */}
                 {msg && (
                     <div className={`alert ${msg.startsWith("❌") ? "alert-danger" : "alert-success"} text-center`}>
                         {msg}
                     </div>
                 )}
 
-                {/* Login Form */}
                 <form onSubmit={handleLogin} noValidate>
                     <div className="mb-3">
                         <label htmlFor="username" className="form-label">

@@ -42,15 +42,13 @@ public class  SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // a) Unblock all CORS preflights
+
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers(  "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tweet/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
 
-                        // b) Allow anonymous access to all /auth/** endpoints
 
-                        // c) Swagger, health, ping
                         .requestMatchers(
                                 "/ping",
                                 "/v3/api-docs/**",
@@ -60,7 +58,7 @@ public class  SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
                         .anyRequest().authenticated());
-                // e) Hook in your JWT validation filter
+
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -68,7 +66,7 @@ public class  SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost" , "http://localhost:80" ,"http://localhost:5173"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

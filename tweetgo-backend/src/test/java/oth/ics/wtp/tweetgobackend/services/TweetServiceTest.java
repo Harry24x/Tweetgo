@@ -41,7 +41,7 @@ class TweetServiceTest {
 
         tweet = new Tweet("Hello #Test", alice);
         tweet.setId(10L);
-        tweet.onCreate();  // set timestamp
+        tweet.onCreate();
     }
 
     @Test
@@ -73,7 +73,6 @@ class TweetServiceTest {
         var dto = new TweetCreationDto();
         dto.setText("Image post");
 
-        // --- only stub what's actually used ---
         MultipartFile img = mock(MultipartFile.class);
         when(img.isEmpty()).thenReturn(false);
 
@@ -205,7 +204,4 @@ class TweetServiceTest {
         assertEquals(1, dtos.size());
         assertEquals("alice", dtos.get(0).getAuthorUsername());
     }
-
-    // you can add more tests for getTweetsByUsername, getTweetById, getCommentsByTweetId, etc.
-
 }

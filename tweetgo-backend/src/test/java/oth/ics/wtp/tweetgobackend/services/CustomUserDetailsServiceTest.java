@@ -26,14 +26,11 @@ class CustomUserDetailsServiceTest {
     @Test
     @DisplayName("loadUserByUsername—when user exists, returns UserDetails")
     void loadUserByUsername_UserExists() {
-        // Arrange
+
         User dbUser = new User("alice", "s3cr3t");
         when(userRepository.findByUsername("alice")).thenReturn(Optional.of(dbUser));
 
-        // Act
         UserDetails details = service.loadUserByUsername("alice");
-
-        // Assert
         assertThat(details.getUsername()).isEqualTo("alice");
         assertThat(details.getPassword()).isEqualTo("s3cr3t");
         assertThat(details.getAuthorities())
@@ -46,11 +43,9 @@ class CustomUserDetailsServiceTest {
     @Test
     @DisplayName("loadUserByUsername—when user missing, throws UsernameNotFoundException")
     void loadUserByUsername_UserMissing() {
-        // Arrange
         when(userRepository.findByUsername("bob"))
                 .thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThatThrownBy(() -> service.loadUserByUsername("bob"))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("User not found");

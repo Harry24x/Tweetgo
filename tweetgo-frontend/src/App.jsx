@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Loginpage from "./Pages/Loginpage";
 import Registerpage from "./Pages/Registerpage";

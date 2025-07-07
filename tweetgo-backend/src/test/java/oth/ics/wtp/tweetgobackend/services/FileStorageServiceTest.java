@@ -20,19 +20,16 @@ class FileStorageServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // 1) Instantiate, which will create the "uploads" dir
         service = new FileStorageService();
 
-        // 2) Reflectively grab its private fileStorageLocation
         Field locField = FileStorageService.class
                 .getDeclaredField("fileStorageLocation");
         locField.setAccessible(true);
         uploadsLocation = (Path) locField.get(service);
 
-        // 3) Clean out ONLY the *contents* of uploadsLocation
         if (Files.exists(uploadsLocation)) {
             Files.walk(uploadsLocation)
-                    .filter(path -> !path.equals(uploadsLocation))   // <-- skip the root
+                    .filter(path -> !path.equals(uploadsLocation))
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
@@ -41,7 +38,6 @@ class FileStorageServiceTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        // Clean up again to leave no temp files behind
         if (Files.exists(uploadsLocation)) {
             Files.walk(uploadsLocation)
                     .filter(path -> !path.equals(uploadsLocation))
@@ -63,21 +59,19 @@ class FileStorageServiceTest {
     void storeFile_savesTxtAndReturnsName() throws IOException {
         byte[] data = "hello world".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file",              // form field name
-                "greeting.txt",      // original filename
-                "text/plain",        // content type
+                "file",
+                "greeting.txt",
+                "text/plain",
                 data
         );
 
         String storedName = service.storeFile(file);
 
-        // it should preserve the ".txt" extension
         assertTrue(
                 storedName.endsWith(".txt"),
                 "Returned filename should preserve the .txt extension"
         );
 
-        // and the file really must exist under uploads/
         Path written = uploadsLocation.resolve(storedName);
         assertTrue(Files.exists(written), "File should be written to uploads directory");
         assertArrayEquals(
@@ -92,14 +86,12 @@ class FileStorageServiceTest {
         byte[] data = "no extension".getBytes();
         MockMultipartFile file = new MockMultipartFile(
                 "file",
-                "noext",            // no "." in the original name
+                "noext",
                 "text/plain",
                 data
         );
 
         String storedName = service.storeFile(file);
-
-        // since original had no dot, service must not introduce any
         assertFalse(
                 storedName.contains("."),
                 "When original filename has no dot, stored name must not contain one"
@@ -111,7 +103,6 @@ class FileStorageServiceTest {
 
     @Test
     void storeFile_ioExceptionDuringCopy_throwsRuntime() throws IOException {
-        // mock a file that throws on getInputStream()
         MultipartFile bad = mock(MultipartFile.class);
         when(bad.getOriginalFilename()).thenReturn("whatever.txt");
         when(bad.getInputStream()).thenThrow(new IOException("disk full"));

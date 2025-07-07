@@ -56,24 +56,19 @@ class HashtagTest {
     @Test
     void testAddTweetAndBiDirectionalLink() {
         hashtag.addTweet(tweetA);
-        // hashtag side
         assertTrue(hashtag.getTweets().contains(tweetA), "should contain tweetA");
-        // tweet side
         assertTrue(tweetA.getHashtags().contains(hashtag), "tweetA should know about the hashtag");
     }
 
     @Test
     void testRemoveTweetAndBiDirectionalUnlink() {
-        // add two distinct tweets
+
         hashtag.addTweet(tweetA);
         hashtag.addTweet(tweetB);
         assertEquals(2, hashtag.getTweets().size(), "both tweets should have been added");
-
-        // remove one
         hashtag.removeTweet(tweetA);
         assertFalse(hashtag.getTweets().contains(tweetA), "hashtag should no longer contain tweetA");
         assertFalse(tweetA.getHashtags().contains(hashtag), "tweetA should no longer reference the hashtag");
-
         hashtag.removeTweet(tweetA);
         assertEquals(1, hashtag.getTweets().size(), "removing non-existent link should not change size");
     }

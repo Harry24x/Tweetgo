@@ -16,7 +16,7 @@ import oth.ics.wtp.tweetgobackend.services.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = { "http://localhost" , "http://localhost:5173", "http://localhost:80" })
 public class AuthController {
 
     @Autowired

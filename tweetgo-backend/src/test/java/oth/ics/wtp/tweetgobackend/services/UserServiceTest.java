@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @Mock
-    private UserRepository userRepo;
+    private UserRepository userRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -43,8 +43,8 @@ class UserServiceTest {
 
     @Test @DisplayName("usernameExists → true/false")
     void usernameExists() {
-        when(userRepo.existsByUsername("alice")).thenReturn(true);
-        when(userRepo.existsByUsername("charlie")).thenReturn(false);
+        when(userRepository.existsByUsername("alice")).thenReturn(true);
+        when(userRepository.existsByUsername("charlie")).thenReturn(false);
 
         assertTrue(svc.usernameExists("alice"));
         assertFalse(svc.usernameExists("charlie"));
@@ -54,36 +54,33 @@ class UserServiceTest {
     void registerUser() {
         when(passwordEncoder.encode("raw")).thenReturn("ENC");
         User saved = new User("new", "ENC");
-        when(userRepo.save(any())).thenReturn(saved);
+        when(userRepository.save(any())).thenReturn(saved);
 
         User out = svc.registerUser("new", "raw");
         assertEquals("new", out.getUsername());
         assertEquals("ENC", out.getPassword());
 
-        // ensure we passed encoded pw to repo
         ArgumentCaptor<User> cap = ArgumentCaptor.forClass(User.class);
-        verify(userRepo).save(cap.capture());
+        verify(userRepository).save(cap.capture());
         assertEquals("ENC", cap.getValue().getPassword());
     }
 
     @Test @DisplayName("followUser → success")
     void followUser_success() {
-        when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
-        when(userRepo.findByUsername("bob")).thenReturn(Optional.of(bob));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(alice));
+        when(userRepository.findByUsername("bob")).thenReturn(Optional.of(bob));
 
         svc.followUser("alice", "bob");
 
-        // relationship established
         assertTrue(alice.getFollowing().contains(bob));
         assertTrue(bob.getFollowers().contains(alice));
-        // both sides saved
-        verify(userRepo, times(1)).save(alice);
-        verify(userRepo, times(1)).save(bob);
+        verify(userRepository, times(1)).save(alice);
+        verify(userRepository, times(1)).save(bob);
     }
 
     @Test @DisplayName("followUser → cannot follow self")
     void followUser_self() {
-        when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(alice));
 
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
@@ -94,7 +91,7 @@ class UserServiceTest {
 
     @Test @DisplayName("followUser → follower not found")
     void followUser_followerNotFound() {
-        when(userRepo.findByUsername("alice")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.empty());
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> svc.followUser("alice", "bob")
@@ -104,8 +101,8 @@ class UserServiceTest {
 
     @Test @DisplayName("followUser → target not found")
     void followUser_targetNotFound() {
-        when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
-        when(userRepo.findByUsername("bob")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(alice));
+        when(userRepository.findByUsername("bob")).thenReturn(Optional.empty());
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> svc.followUser("alice", "bob")
@@ -117,23 +114,22 @@ class UserServiceTest {
     void unfollowUser_success() {
         // establish first
         alice.followUser(bob);
-        when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
-        when(userRepo.findByUsername("bob")).thenReturn(Optional.of(bob));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(alice));
+        when(userRepository.findByUsername("bob")).thenReturn(Optional.of(bob));
 
         svc.unfollowUser("alice", "bob");
 
         assertFalse(alice.getFollowing().contains(bob));
         assertFalse(bob.getFollowers().contains(alice));
-        verify(userRepo).save(alice);
-        verify(userRepo).save(bob);
+        verify(userRepository).save(alice);
+        verify(userRepository).save(bob);
     }
 
     @Test @DisplayName("searchUsers → filters current user")
     void searchUsers() {
         User charlie = new User("charlie","x");
-        when(userRepo.findByUsernameContaining("a")).thenReturn(List.of(alice, bob, charlie));
+        when(userRepository.findByUsernameContaining("a")).thenReturn(List.of(alice, bob, charlie));
 
-        // alice is current → should remove alice from results
         List<UserDto> results = svc.searchUsers("a", "alice");
         assertEquals(2, results.size());
         Set<String> names = Set.of(results.get(0).getUsername(), results.get(1).getUsername());
@@ -142,7 +138,7 @@ class UserServiceTest {
 
     @Test @DisplayName("getUserProfile → self (no follow flag)")
     void getUserProfile_self() {
-        when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(alice));
         UserDto dto = svc.getUserProfile("alice", "alice");
         assertEquals("alice", dto.getUsername());
         assertFalse(dto.isFollowedByCurrentUser());
@@ -152,8 +148,8 @@ class UserServiceTest {
     void getUserProfile_other() {
         // bob follows alice
         bob.followUser(alice);
-        when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
-        when(userRepo.findByUsername("bob")).thenReturn(Optional.of(bob));
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(alice));
+        when(userRepository.findByUsername("bob")).thenReturn(Optional.of(bob));
 
         UserDto dto = svc.getUserProfile("alice", "bob");
         assertTrue(dto.isFollowedByCurrentUser());
@@ -161,7 +157,7 @@ class UserServiceTest {
 
     @Test @DisplayName("getUserProfile → not found")
     void getUserProfile_notFound() {
-        when(userRepo.findByUsername("nobody")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("nobody")).thenReturn(Optional.empty());
         assertThrows(
                 IllegalArgumentException.class,
                 () -> svc.getUserProfile("nobody", "alice")

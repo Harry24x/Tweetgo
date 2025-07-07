@@ -84,7 +84,7 @@ public class UserService {
     }
     @Transactional
     public UserDto updateProfile(String username, UserDto update) {
-        // 1. load the existing user
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
 
@@ -93,8 +93,6 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(update.getPassword()));
         }
 
-
-        // 3. save and return a fresh DTO
         userRepository.save(user);
         return mapUserToDto(user, username);
     }

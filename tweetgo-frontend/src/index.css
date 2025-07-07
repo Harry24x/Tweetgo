@@ -1,15 +1,15 @@
 
 :root {
-  --neon-green: #1da1f2;      /* primary Twitter blue */
-  --neon-blue:  #657786;      /* secondary text color */
-  --neon-purple: #f5f8fa;     /* background cards */
-  --neon-pink:   #ffffff;     /* default page bg */
-  --neon-orange: #e1e8ed;     /* borders */
-  --dark-bg:     #ffffff;     /* overall page */
-  --darker-bg:   #f5f8fa;     /* card backgrounds */
-  --grid-bg:     #e1e8ed;     /* subtle grid lines */
-  --text-primary:#14171a;     /* primary text */
-  --text-secondary:#657786;    /* secondary text */
+  --neon-green: #1da1f2;
+  --neon-blue:  #657786;
+  --neon-purple: #f5f8fa;
+  --neon-pink:   #ffffff;
+  --neon-orange: #e1e8ed;
+  --dark-bg:     #ffffff;
+  --darker-bg:   #f5f8fa;
+  --grid-bg:     #e1e8ed;
+  --text-primary:#14171a;
+  --text-secondary:#657786;
   --accent-glow: none;
   --box-shadow:  0 1px 3px rgba(0, 0, 0, 0.1);
 }

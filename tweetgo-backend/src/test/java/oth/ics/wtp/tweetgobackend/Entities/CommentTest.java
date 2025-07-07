@@ -17,8 +17,6 @@ public class CommentTest {
         Tweet tweet = new Tweet("Hello", author);
         comment.setAuthor(author);
         comment.setTweet(tweet);
-
-        // Manually invoke lifecycle callback to set timestamp
         comment.onCreate();
 
         assertEquals(42L, comment.getId());
@@ -35,7 +33,6 @@ public class CommentTest {
         Tweet tweet = new Tweet("Testing", author);
         Comment comment = new Comment("Nice!", author, tweet);
 
-        // before persist, timestamp should be null
         assertNull(comment.getTimestamp());
 
         comment.onCreate();
@@ -76,7 +73,6 @@ public class CommentTest {
         assertTrue(str.contains("99"));
         assertTrue(str.contains("Wow!"));
         assertTrue(str.contains("alice"));
-        // timestamp should appear
         assertTrue(str.contains("timestamp="));
     }
 }

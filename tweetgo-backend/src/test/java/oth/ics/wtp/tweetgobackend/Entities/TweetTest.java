@@ -103,7 +103,7 @@ class TweetTest {
     @Test
     void testToStringIncludesAllFields() {
         tweet.setId(42L);
-        tweet.onCreate(); // set timestamp
+        tweet.onCreate();
         tweet.addLike(new User("u1","p"));
         tweet.addComment(new Comment());
 

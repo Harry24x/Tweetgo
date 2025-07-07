@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../Context/AuthContext';
 import TweetCard from '../components/TweetCard';
 import axios from '../axios';
-import CyberNav from '../components/CyberNav';  // ← import it
+import CyberNav from '../components/CyberNav';
 
 const DiscoverPage = () => {
   const { user } = useContext(AuthContext);
@@ -160,7 +160,6 @@ const DiscoverPage = () => {
           </div>
 
           <div className="row">
-            {/* User list */}
             <div className="col-md-4 mb-4">
               <h5>Users</h5>
               {users.length === 0 && searchQuery && !searchLoading && (
@@ -204,7 +203,6 @@ const DiscoverPage = () => {
               ))}
             </div>
 
-            {/* Selected user’s tweets */}
             <div className="col-md-8">
               {selectedUser && (
                   <>
