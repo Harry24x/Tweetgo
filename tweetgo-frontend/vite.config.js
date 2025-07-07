@@ -11,7 +11,7 @@ export default defineConfig({
         target: "http://localhost:8080",
         changeOrigin: true
       },
-      // anything under /tweet → /api/tweet
+
       "/tweet": {
         target: "http://localhost:8080/api/tweet",
         changeOrigin: true,

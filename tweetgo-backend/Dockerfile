@@ -10,7 +10,6 @@ RUN mvn clean package -DskipTests
 # Stage 2: Create the runtime image using a slim JRE
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-# The application jar will be named based on your pom.xml artifactId and version
 COPY --from=build /build/target/tweetgo-backend-0.0.1-SNAPSHOT.jar tweetgo-backend.jar
 EXPOSE 8080
 
