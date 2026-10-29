@@ -1,5 +1,7 @@
 # TweetGo
 
+[![Backend tests](https://github.com/Harry24x/Tweetgo/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/Harry24x/Tweetgo/actions/workflows/backend-tests.yml)
+
 A full-stack microblogging platform (Twitter-like) with a React frontend and a Spring Boot REST API.
 Built as a solo project for the Web Technology Project course at OTH Regensburg.
 
