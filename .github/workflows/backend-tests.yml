@@ -12,8 +12,8 @@ jobs:
       run:
         working-directory: tweetgo-backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -31,3 +31,6 @@ jobs:
               echo "::error title=$(basename "$f" .txt)::$(grep -m3 -E 'Exception|Error|expected' "$f" | tr '\n' ' ' | cut -c1-400)"
             fi
           done
+          total=$(cat target/surefire-reports/*.txt 2>/dev/null | grep -oE "Tests run: [0-9]+" | awk '{s+=$3} END {print s+0}')
+          echo "::notice title=Test total::$total tests run"
+          echo "**Total: $total tests**" >> "$GITHUB_STEP_SUMMARY"
