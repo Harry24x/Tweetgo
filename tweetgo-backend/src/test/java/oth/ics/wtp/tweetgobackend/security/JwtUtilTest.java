@@ -14,7 +14,7 @@ class JwtUtilTest {
     @BeforeEach
     void setUp() {
 
-        jwtUtil = new JwtUtil(SECRET, 1000L);
+        jwtUtil = new JwtUtil(SECRET, 60_000L);
     }
 
     @Test
@@ -37,7 +37,7 @@ class JwtUtilTest {
     @Test
     void validateToken_withWrongSecretShouldFail() {
         String token = jwtUtil.generateToken("carol");
-        JwtUtil other = new JwtUtil("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1000L);
+        JwtUtil other = new JwtUtil("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 60_000L);
         assertFalse(other.validateToken(token), "Token signed with a different secret must not validate");
     }
 
