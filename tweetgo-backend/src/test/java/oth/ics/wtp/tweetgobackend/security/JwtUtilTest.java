@@ -28,9 +28,13 @@ class JwtUtilTest {
     @Test
     void validateToken_tamperedSignatureShouldFail() {
         String token = jwtUtil.generateToken("bob");
-        char last = token.charAt(token.length() - 1);
-        String tampered = token.substring(0, token.length() - 1)
-                + (last == 'a' ? 'b' : 'a');
+        // Change the first character of the signature part. The last character of a
+        // Base64URL signature can contain unused bits, so changing it may not alter the signature.
+        int sigStart = token.lastIndexOf('.') + 1;
+        char first = token.charAt(sigStart);
+        String tampered = token.substring(0, sigStart)
+                + (first == 'a' ? 'b' : 'a')
+                + token.substring(sigStart + 1);
         assertFalse(jwtUtil.validateToken(tampered), "Tampered token should not validate");
     }
 
