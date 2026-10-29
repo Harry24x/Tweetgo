@@ -202,7 +202,7 @@ class TweetControllerTest {
         out.setText("Nice!");
         out.setAuthorUsername("uma");
 
-        when(tweetService.addComment(3L, in, "uma")).thenReturn(out);
+        when(tweetService.addComment(eq(3L), any(CommentCreationDto.class), eq("uma"))).thenReturn(out);
 
         mockMvc.perform(post("/api/tweet/3/comments")
                         .contentType(MediaType.APPLICATION_JSON)
