@@ -1,0 +1,16 @@
+# Local database data (Docker volume) and uploads
+db-data/
+uploads/
+
+# Secrets
+.env
+
+# Build output and dependencies
+target/
+node_modules/
+dist/
+
+# IDE files
+.idea/
+*.iml
+.vscode/

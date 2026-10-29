@@ -29,7 +29,7 @@
     "globals": "^16.0.0",
     "vite": "^6.3.5"
   },
-  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "description": "React frontend for TweetGo, a microblogging platform",
   "main": "eslint.config.js",
   "keywords": [],
   "author": "",

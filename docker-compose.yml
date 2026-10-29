@@ -5,10 +5,10 @@ services:
     container_name: tweetgo-db
     restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=asdf1234
+      - MARIADB_ROOT_PASSWORD=${DB_PASSWORD}
       - MARIADB_DATABASE=tweetgo
     volumes:
-      - ./db-data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     ports:
       - "3306:3306"
 
@@ -36,7 +36,8 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/tweetgo?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=asdf1234
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
 
   frontend:
     build:
@@ -50,4 +51,3 @@ services:
 
 volumes:
   mariadb_data:
-  backend_uploads:
