@@ -1,0 +1,14 @@
+# Caddy gets a free HTTPS certificate (Let's Encrypt) for your domain automatically.
+{$DOMAIN} {
+    encode gzip
+
+    # REST API -> Spring Boot
+    handle /api/* {
+        reverse_proxy backend:8080
+    }
+
+    # Everything else -> React app (served by Nginx)
+    handle {
+        reverse_proxy frontend:80
+    }
+}

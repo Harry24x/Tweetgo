@@ -132,6 +132,16 @@ The frontend calls the API at `http://localhost:8080` by default. To use another
 | `VITE_API_URL` | frontend build (env var or Docker build arg) | `http://localhost:8080` |
 | `CORS_ALLOWED_ORIGINS` | backend env var, comma separated frontend URLs | `http://localhost,http://localhost:80,http://localhost:5173` |
 
+## Deploy to a server
+
+`deploy/` contains a production setup for one Linux server (for example an Oracle Cloud Always Free VM):
+Caddy serves everything over HTTPS with a free Let's Encrypt certificate, and only ports 80/443 are public.
+
+```bash
+git clone https://github.com/Harry24x/Tweetgo.git && cd Tweetgo
+bash deploy/deploy.sh      # asks for your domain once, generates passwords, builds and starts
+```
+
 ## Tests
 
 85 unit and integration tests cover controllers (MockMvc), services, entities, DTO validation and JWT security.

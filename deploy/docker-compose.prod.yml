@@ -1,0 +1,62 @@
+# Production setup for a single Linux server (e.g. Oracle Cloud Always Free).
+# Only Caddy is public (ports 80/443, automatic HTTPS). Database and API stay private.
+#
+# Usage (from the repo root on the server):
+#   bash deploy/deploy.sh
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_PASSWORD}
+      - MARIADB_DATABASE=tweetgo
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ../tweetgo-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/tweetgo?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ALLOWED_ORIGINS=https://${DOMAIN}
+      - JAVA_TOOL_OPTIONS=-Xmx512m
+
+  frontend:
+    build:
+      context: ../tweetgo-frontend
+      args:
+        - VITE_API_URL=https://${DOMAIN}
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  mariadb_data:
+  caddy_data:
+  caddy_config:
