@@ -20,7 +20,7 @@ import oth.ics.wtp.tweetgobackend.repositories.UserRepository;
 import oth.ics.wtp.tweetgobackend.repositories.CommentRepository;
 import oth.ics.wtp.tweetgobackend.repositories.HashtagRepository;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -105,13 +105,12 @@ public class TweetService {
     public List<TweetDto> getAggregatedTimeline(String username, int page) {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
-        List<User> followedUsers = List.copyOf(currentUser.getFollowing());
-        if (followedUsers.isEmpty()) {
-            return Collections.emptyList();
-        }
+        // Home feed = tweets from people you follow + your own tweets
+        List<User> authors = new ArrayList<>(currentUser.getFollowing());
+        authors.add(currentUser);
 
         Pageable pageable = PageRequest.of(page, 20);
-        List<Tweet> timelinetweets = tweetRepository.findByAuthorInOrderByTimestampDesc(followedUsers, pageable);
+        List<Tweet> timelinetweets = tweetRepository.findByAuthorInOrderByTimestampDesc(authors, pageable);
 
         return timelinetweets.stream()
                 .map(tweet -> maptweetToDto(tweet, currentUser))
@@ -127,10 +126,6 @@ public class TweetService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
-
-        if (tweet.getAuthor().equals(user)) {
-            throw new IllegalArgumentException("You cannot like your own tweet.");
-        }
 
         if (tweet.getLikedByUsers().contains(user)) {
             throw new IllegalArgumentException("You have already liked this tweet.");
@@ -237,9 +232,20 @@ public class TweetService {
                 .orElse(null);
         
         Pageable pageable = PageRequest.of(page, 20);
-        List<Tweet> tweets = tweetRepository.findByHashtagName(hashtagName, pageable);
+        List<Tweet> tweets = tweetRepository.findByHashtagName(hashtagName.toLowerCase(), pageable);
         
         return tweets.stream()
+                .map(tweet -> maptweetToDto(tweet, currentUser))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<TweetDto> getExploreTimeline(String currentUsername, int page) {
+        User currentUser = currentUsername == null ? null
+                : userRepository.findByUsername(currentUsername).orElse(null);
+
+        Pageable pageable = PageRequest.of(page, 20);
+        return tweetRepository.findAllByOrderByTimestampDesc(pageable).stream()
                 .map(tweet -> maptweetToDto(tweet, currentUser))
                 .collect(Collectors.toList());
     }

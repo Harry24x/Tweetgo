@@ -16,6 +16,8 @@ public interface TweetRepository extends JpaRepository<Tweet, Long> {
 
     List<Tweet> findByAuthorOrderByTimestampDesc(User author, Pageable pageable);
 
+    List<Tweet> findAllByOrderByTimestampDesc(Pageable pageable);
+
 
     List<Tweet> findByAuthorInOrderByTimestampDesc(List<User> authors, Pageable pageable);
 

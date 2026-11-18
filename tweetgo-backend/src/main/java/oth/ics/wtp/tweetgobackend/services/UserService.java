@@ -109,6 +109,9 @@ public class UserService {
         dto.setUsername(user.getUsername());
         dto.setFollowersCount(user.getFollowers().size());
         dto.setFollowingCount(user.getFollowing().size());
+        dto.setFullName(user.getFullName());
+        dto.setAddress(user.getAddress());
+        dto.setBio(user.getBio());
         
         if (currentUsername != null && !currentUsername.equals(user.getUsername())) {
             User currentUser = userRepository.findByUsername(currentUsername).orElse(null);

@@ -9,7 +9,7 @@ Built as a solo project for the Web Technology Project course at OTH Regensburg.
 
 | Layer | Technologies |
 |---|---|
-| Frontend | React 19, JavaScript, React Router, Bootstrap / React-Bootstrap, Axios, Vite |
+| Frontend | React 19, JavaScript, React Router, Axios, Vite, plain CSS (light + dark mode) |
 | Backend | Java 21, Spring Boot 3.5, Spring Security, JWT, Spring Data JPA, Bean Validation |
 | Database | MariaDB (H2 in-memory for tests) |
 | API docs | Swagger / OpenAPI (springdoc) |
@@ -23,7 +23,10 @@ Built as a solo project for the Web Technology Project course at OTH Regensburg.
 - Like / unlike posts and comment on posts
 - Follow / unfollow users, user search and profile editing
 - Hashtags with a hashtag feed
-- Paginated timelines (own feed and user profiles)
+- Home feed (your posts + people you follow) and an Explore feed with everyone's latest posts
+- Post detail page with replies
+- Paginated timelines ("Show more")
+- Responsive, minimal UI with automatic dark mode
 
 ## Architecture
 
@@ -72,6 +75,13 @@ cd tweetgo-frontend
 npm install
 npm run dev                 # http://localhost:5173
 ```
+
+## Configuration for hosting
+
+| Setting | Where | Default |
+|---|---|---|
+| `VITE_API_URL` | frontend build (env var or Docker build arg) | `http://localhost:8080` |
+| `CORS_ALLOWED_ORIGINS` | backend env var, comma separated frontend URLs | `http://localhost,http://localhost:80,http://localhost:5173` |
 
 ## Tests
 

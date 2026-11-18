@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,9 +27,12 @@ import java.util.List;
 public class  SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final List<String> allowedOrigins;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public SecurityConfig(JwtFilter jwtFilter,
+                          @Value("${cors.allowed-origins:http://localhost,http://localhost:5173}") List<String> allowedOrigins) {
         this.jwtFilter = jwtFilter;
+        this.allowedOrigins = allowedOrigins;
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,10 +47,14 @@ public class  SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // not logged in / expired token -> 401 (frontend then sends the user to login)
+                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers(  "/api/auth/**").permitAll()
+                        // the home feed is personal, so it needs a logged-in user
+                        .requestMatchers(HttpMethod.GET, "/api/tweet/feed").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/tweet/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
 
@@ -66,7 +76,7 @@ public class  SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost" , "http://localhost:80" ,"http://localhost:5173"));
+        config.setAllowedOrigins(allowedOrigins.stream().map(String::trim).toList());
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

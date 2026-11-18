@@ -1,6 +1,10 @@
 package oth.ics.wtp.tweetgobackend.Dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
 
 public class TweetDto {
@@ -30,8 +34,16 @@ public class TweetDto {
         this.text = text;
     }
 
+    @JsonIgnore
     public LocalDateTime getTimestamp() {
         return timestamp;
+    }
+
+    // Sent to the frontend as an ISO instant with time zone (e.g. 2026-11-18T09:30:00Z),
+    // so the browser always shows the correct local time.
+    @JsonProperty("timestamp")
+    public Instant getTimestampInstant() {
+        return timestamp == null ? null : timestamp.atZone(ZoneId.systemDefault()).toInstant();
     }
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;

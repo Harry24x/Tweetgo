@@ -101,7 +101,7 @@ class TweetServiceTest {
     }
 
     @Test
-    @DisplayName("getAggregatedTimeline: empty following → empty list")
+    @DisplayName("getAggregatedTimeline: no following and no own tweets → empty list")
     void getAggregatedTimeline_empty() {
         alice.getFollowing().clear();
         when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
@@ -118,7 +118,7 @@ class TweetServiceTest {
 
         List<Tweet> tweets = List.of(tweet);
         when(tweetRepo.findByAuthorInOrderByTimestampDesc(
-                eq(List.of(bob)),
+                eq(List.of(bob, alice)),
                 eq(PageRequest.of(1,20))
         )).thenReturn(tweets);
 
@@ -138,16 +138,13 @@ class TweetServiceTest {
     }
 
     @Test
-    @DisplayName("likeTweet: can't like own tweet")
+    @DisplayName("likeTweet: users can like their own tweet")
     void likeTweet_ownTweet() {
         when(tweetRepo.findById(10L)).thenReturn(Optional.of(tweet));
         when(userRepo.findByUsername("alice")).thenReturn(Optional.of(alice));
 
-        var ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> svc.liketweet(10L,"alice")
-        );
-        assertTrue(ex.getMessage().contains("own tweet"));
+        svc.liketweet(10L, "alice");
+        assertTrue(tweet.getLikedByUsers().contains(alice));
     }
 
     @Test

@@ -10,11 +10,11 @@ import oth.ics.wtp.tweetgobackend.Dto.CommentDto;
 import oth.ics.wtp.tweetgobackend.Dto.CommentCreationDto;
 import oth.ics.wtp.tweetgobackend.services.TweetService;
 import oth.ics.wtp.tweetgobackend.Entities.Tweet;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tweet")
-@CrossOrigin(origins = { "http://localhost" ,"http://localhost:5173", "http://localhost:80" })
 public class TweetController {
 
     private final TweetService tweetService;
@@ -26,7 +26,7 @@ public class TweetController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createTweet(
-            @RequestBody TweetCreationDto dto,
+            @Valid @RequestBody TweetCreationDto dto,
             Authentication auth
     ) {
         try {
@@ -47,6 +47,14 @@ public class TweetController {
             Authentication auth) {
         List<TweetDto> feed = tweetService.getAggregatedTimeline(auth.getName(), page);
         return ResponseEntity.ok(feed);
+    }
+
+    @GetMapping("/explore")
+    public ResponseEntity<List<TweetDto>> getExplore(
+            @RequestParam(defaultValue = "0") int page,
+            Authentication auth) {
+        String current = auth != null ? auth.getName() : null;
+        return ResponseEntity.ok(tweetService.getExploreTimeline(current, page));
     }
 
     @GetMapping("/user/{username}")
@@ -101,7 +109,7 @@ public class TweetController {
     @PostMapping("/{tweetId}/comments")
     public ResponseEntity<CommentDto> addComment(
             @PathVariable Long tweetId,
-            @RequestBody CommentCreationDto commentDto,
+            @Valid @RequestBody CommentCreationDto commentDto,
             Authentication auth
     ) {
         CommentDto comment = tweetService.addComment(tweetId, commentDto, auth.getName());

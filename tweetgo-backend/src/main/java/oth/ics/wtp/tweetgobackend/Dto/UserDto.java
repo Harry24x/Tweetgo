@@ -1,7 +1,10 @@
 package oth.ics.wtp.tweetgobackend.Dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class UserDto {
     private String username;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private int followersCount;
     private int followingCount;
@@ -9,14 +12,13 @@ public class UserDto {
     private String fullName;
     private String address;
     private String bio;
-    private boolean isMe;
 
     public UserDto() {}
 
     public String getPassword() {
         return password;
     }
-    public void setPassword(String username) {
+    public void setPassword(String password) {
         this.password = password;
     }
     public String getUsername() {
@@ -51,12 +53,24 @@ public class UserDto {
     }
 
     public String getBio() {
-    return bio;}
+        return bio;
+    }
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 
     public String getAddress() {
-        return address;}
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public String getFullName() {
-    return fullName;}
+        return fullName;
+    }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 }
 
